@@ -1,0 +1,19 @@
+{
+    "name": "anturi/larastarted",
+    "description": "This package gives new route methods and it use a controller crud ready to use by herency",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Anturi\\Larastarted\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "illuminate/support": "12.x-dev",
+        "illuminate/database": "12.x-dev",
+        "illuminate/routing": "12.x-dev",
+        "illuminate/http": "12.x-dev",
+        "illuminate/console": "12.x-dev"
+    }
+}
