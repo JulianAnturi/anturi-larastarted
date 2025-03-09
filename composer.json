@@ -10,10 +10,10 @@
     },
     "minimum-stability": "dev",
     "require": {
-        "illuminate/support": "12.x-dev",
-        "illuminate/database": "12.x-dev",
-        "illuminate/routing": "12.x-dev",
-        "illuminate/http": "12.x-dev",
-        "illuminate/console": "12.x-dev"
+        "illuminate/support": "^12.1",
+        "illuminate/database": "^12.1",
+        "illuminate/routing": "^12.1",
+        "illuminate/http": "^12.1",
+        "illuminate/console": "^12.1"
     }
 }
