@@ -1,10 +1,10 @@
 <?php
 
 
-namespace JulianAnturi\laraStarted\Helpers;
+namespace anturi\larastarted\Helpers;
 
-use JulianAnturi\laraStarted\Models\Log; 
-use JulianAnturi\larastarted\Helpers\ResponseService;
+use anturi\larastarted\Models\Log; 
+use anturi\larastarted\Helpers\ResponseService;
 
 class LogService extends ResponseService
 {

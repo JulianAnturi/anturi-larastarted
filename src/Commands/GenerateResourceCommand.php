@@ -1,6 +1,6 @@
 <?php
 
-namespace JulianAnturi\laravelStarted\Commands;
+namespace anturi\larastarted\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;

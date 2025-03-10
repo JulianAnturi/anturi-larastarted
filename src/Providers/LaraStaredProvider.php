@@ -1,9 +1,9 @@
 <?php
 
-namespace JulianAnturi\laraStarted\Providers;
+namespace anturi\larastarted\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use JulianAnturi\laravelStarted\Commands\GenerateResourcesCommand;
+use anturi\larastarted\Commands\GenerateResourcesCommand;
 use Illuminate\Support\Facades\App;
 class MiPaqueteServiceProvider extends ServiceProvider
 {
@@ -11,7 +11,7 @@ class MiPaqueteServiceProvider extends ServiceProvider
     {
         // Registrar el helper de respuestas
         $this->app->singleton('ResponseService', function ($app) {
-            return new \JulianAnturi\laraStarted\Helpers\ResponseService();
+            return new \anturi\larastarted\Helpers\ResponseService();
         });
     }
 

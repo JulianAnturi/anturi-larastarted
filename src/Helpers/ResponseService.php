@@ -1,6 +1,6 @@
 <?php 
 
-namespace JulianAnturi\larastarted\Helpers;
+namespace anturi\larastarted\Helpers;
 
 
 use Exception;
