@@ -1,6 +1,6 @@
 <?php
 
-namespace anturi\larastarted\Models;
+namespace Anturi\Larastarted\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

@@ -1,6 +1,6 @@
 <?php 
 
-namespace anturi\larastarted\Helpers;
+namespace Anturi\Larastarted\Helpers;
 
 
 

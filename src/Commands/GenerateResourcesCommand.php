@@ -1,6 +1,6 @@
 <?php
 
-namespace anturi\larastarted\Commands;
+namespace Anturi\Larastarted\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\App;
 
 class GenerateResourcesCommand extends Command
 {
-    protected $signature = 'anturi:generate {name}';
+    protected $signature = 'anturi:generate {name} {table}';
     protected $description = 'Genera un Controlador, Modelo y Migración.';
 
     public function handle()
@@ -19,7 +19,7 @@ class GenerateResourcesCommand extends Command
         $controllerPath = App::path("Http/Controllers/{$name}Controller.php");
         $modelPath = App::path("Models/{$name}.php");
         $migrationFileName = date('Y_m_d_His') . "_create_{$tableName}_table.php";
-        $migrationPath = App::database_path("migrations/{$migrationFileName}");
+        $migrationPath = database_path("migrations/{$migrationFileName}");
 
         // ✅ Crear Controlador
         File::put($controllerPath, "<?php\n\nnamespace App\Http\Controllers;\n\nuse App\Models\\{$name};\nuse Illuminate\Http\Request;\nuse anturi\laraStarted\Controllers\BaseController;\nuse anturi\laraStarted\Helpers\ResponseService;\nuse anturi\laraStarted\Helpers\CrudService;\n\nclass {$name}Controller extends BaseController\n{\n    protected \$model = {$name}::class;\n    protected \$table = '{$tableName}';\n    protected \$class = '{$name}Controller';\n    protected \$responseName = '{$name}';\n\n    public function __construct(CrudService \$crudService, ResponseService \$responseService)\n    {\n        parent::__construct(\$crudService, \$responseService);\n    }\n\n    /**\n     * Mostrar todos los registros.\n     */\n    public function index(Request \$request)\n    {\n        return \$this->antIndex(\$request);\n    }\n\n    /**\n     * Guardar un nuevo registro en la base de datos.\n     */\n    public function store(Request \$request)\n    {\n        return \$this->antStore(\$request);\n    }\n\n    /**\n     * Mostrar un registro específico.\n     */\n    public function show(\$id)\n    {\n        return \$this->antShow(\$this->table, 'id');\n    }\n\n    /**\n     * Actualizar un registro en la base de datos.\n     */\n    public function update(Request \$request, \$id)\n    {\n        return \$this->antUpdate(\$request, \$id);\n    }\n\n    /**\n     * Eliminar un registro de la base de datos.\n     */\n    public function destroy(\$id)\n    {\n        return \$this->antDestroy(\$id);\n    }\n\n    /**\n     * Seleccionar registros con campos específicos.\n     */\n   // public function select(\$id, \$field = 'name')\n //   {\n       // return \$this->antSelect(\$this->table, \$id, \$field);\n  //  }\n\n    /**\n     * Obtener registros relacionados de otra tabla.\n     */\n  //  public function subSelect(\$table, \$tableId, \$parentTable, \$parentTableId, \$parentIdValue, \$field)\n    {\n        return \$this->antsubSelect(\$table, \$tableId, \$parentTable, \$parentTableId, \$parentIdValue, \$field);\n    }\n}\n");

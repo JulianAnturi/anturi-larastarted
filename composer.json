@@ -8,12 +8,23 @@
             "Anturi\\Larastarted\\": "src/"
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "require": {
         "illuminate/support": "^12.1",
         "illuminate/database": "^12.1",
         "illuminate/routing": "^12.1",
         "illuminate/http": "^12.1",
         "illuminate/console": "^12.1"
+    },
+    "extra":{
+      "laravel":{
+        "providers": [
+          "Anturi\\Larastarted\\Providers\\AnturiServiceProvider"
+
+        ]
+      }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "11.5.x-dev"
     }
 }

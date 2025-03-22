@@ -1,14 +1,15 @@
 <?php
 
 
-namespace anturi\larastarted\Controllers;
+namespace Anturi\Larastarted\Controllers;
 
-use Illuminate\Routing\Controller;
+// use Illuminate\Routing\Controller;
+use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
-use anturi\larastarted\Helpers\ResponseService;
-use anturi\larastarted\Helpers\LogService;
-use anturi\larastarted\Helpers\CrudService;
+use Anturi\Larastarted\Helpers\ResponseService;
+use Anturi\Larastarted\Helpers\LogService;
+use Anturi\Larastarted\Helpers\CrudService;
 use Illuminate\Support\Facades\DB;
 use Exception;
 

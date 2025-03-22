@@ -1,6 +1,6 @@
 <?php
 
-namespace anturi\larastarted;
+namespace Anturi\Larastarted;
 
 use Illuminate\Support\Facades\Route as LaravelRoute;
 
