@@ -22,7 +22,7 @@ class GenerateResourcesCommand extends Command
     $migrationPath = database_path("migrations/{$migrationFileName}");
 
     // ✅ Crear Controlador
-    File::put($controllerPath, "<?php\n\nnamespace App\Http\Controllers;\n\nuse App\Models\\{$name};\nuse Illuminate\Http\Request;\nuse anturi\laraStarted\Controllers\BaseController;\nuse anturi\laraStarted\Helpers\ResponseService;\nuse anturi\laraStarted\Helpers\CrudService;\n\nclass {$name}Controller extends BaseController\n{\n    protected \$model = {$name}::class;\n    protected \$table = '{$tableName}';\n    protected \$class = '{$name}Controller';\n    protected \$responseName = '{$name}';\n\n    public function __construct(CrudService \$crudService, ResponseService \$responseService)\n    {\n        parent::__construct(\$crudService, \$responseService);\n    }\n\n    /**\n     * Mostrar todos los registros.\n     */\n    public function index(Request \$request)\n    {\n        return \$this->antIndex(\$request);\n    }\n\n    /**\n     * Guardar un nuevo registro en la base de datos.\n     */\n    public function store(Request \$request)\n    {\n        return \$this->antStore(\$request);\n    }\n\n    /**\n     * Mostrar un registro específico.\n     */\n    public function show(\$id)\n    {\n        return \$this->antShow(\$this->table, 'id');\n    }\n\n    /**\n     * Actualizar un registro en la base de datos.\n     */\n    public function update(Request \$request, \$id)\n    {\n        return \$this->antUpdate(\$request, \$id);\n    }\n\n    /**\n     * Eliminar un registro de la base de datos.\n     */\n    public function destroy(\$id)\n    {\n        return \$this->antDestroy(\$id);\n    }\n\n    /**\n     * Seleccionar registros con campos específicos.\n     */\n   // public function select(\$id, \$field = 'name')\n //   {\n       // return \$this->antSelect(\$this->table, \$id, \$field);\n  //  }\n\n    /**\n     * Obtener registros relacionados de otra tabla.\n     */\n  //  public function subSelect(\$table, \$tableId, \$parentTable, \$parentTableId, \$parentIdValue, \$field)\n    {\n        return \$this->antsubSelect(\$table, \$tableId, \$parentTable, \$parentTableId, \$parentIdValue, \$field);\n    }\n}\n");
+    File::put($controllerPath, "<?php\n\nnamespace App\Http\Controllers;\n\nuse App\Models\\{$name};\nuse Illuminate\Http\Request;\nuse Anturi\Larastarted\Controllers\BaseController;\nuse Anturi\Larastarted\Helpers\ResponseService;\nuse Anturi\Larastarted\Helpers\CrudService;\n\nclass {$name}Controller extends BaseController\n{\n    protected \$model = {$name}::class;\n    protected \$table = '{$tableName}';\n    protected \$class = '{$name}Controller';\n    protected \$responseName = '{$name}';\n\n    public function __construct(CrudService \$crudService, ResponseService \$responseService)\n    {\n        parent::__construct(\$crudService, \$responseService);\n    }\n\n    /**\n     * Mostrar todos los registros.\n     */\n    public function index(Request \$request)\n    {\n        return \$this->antIndex(\$request);\n    }\n\n    /**\n     * Guardar un nuevo registro en la base de datos.\n     */\n    public function store(Request \$request)\n    {\n        return \$this->antStore(\$request);\n    }\n\n    /**\n     * Mostrar un registro específico.\n     */\n    public function show(\$id)\n    {\n        return \$this->antShow(\$this->table, 'id');\n    }\n\n    /**\n     * Actualizar un registro en la base de datos.\n     */\n    public function update(Request \$request, \$id)\n    {\n        return \$this->antUpdate(\$request, \$id);\n    }\n\n    /**\n     * Eliminar un registro de la base de datos.\n     */\n    public function destroy(\$id)\n    {\n        return \$this->antDestroy(\$id);\n    }\n\n    /**\n     * Seleccionar registros con campos específicos.\n     */\n   // public function select(\$id, \$field = 'name')\n //   {\n       // return \$this->antSelect(\$this->table, \$id, \$field);\n  //  }\n\n    /**\n     * Obtener registros relacionados de otra tabla.\n     */\n  //  public function subSelect(\$table, \$tableId, \$parentTable, \$parentTableId, \$parentIdValue, \$field)\n    {\n        return \$this->antsubSelect(\$table, \$tableId, \$parentTable, \$parentTableId, \$parentIdValue, \$field);\n    }\n}\n");
     // ✅ Preguntar si se debe crear una migración
     $fields = [];
     if ($this->confirm("¿Deseas crear una migración para {$tableName}?", true)) {
@@ -34,11 +34,18 @@ class GenerateResourcesCommand extends Command
             ['string', 'integer', 'unsignedBigInteger', 'boolean', 'text', 'date', 'timestamps'],
             0
           );
+          $length = null;
+          $typesWithLength = ['string', 'integer'];
+          if (in_array($fieldType, $typesWithLength)) {
+            $length = $this->ask("¿Longitud para '{$fieldName}'? (deja vacío para usar la predeterminada)");
+            $length = is_numeric($length) ? (int) $length : null;
+          }
           $isNullable = $this->confirm("¿El campo '{$fieldName}' puede ser nulo?", false);
           $fields[] = [
             'fieldName' => $fieldName,
             'fieldType' => $fieldType,
             'nullable' => $isNullable,
+            'length' => $length
           ];
         }
       } while ($fieldName);
@@ -60,15 +67,16 @@ class GenerateResourcesCommand extends Command
       // ✅ Generar contenido de la migración
       $migrationContent = "<?php\n\nuse Illuminate\Database\Migrations\Migration;\nuse Illuminate\Database\Schema\Blueprint;\nuse Illuminate\Support\Facades\Schema;\n\nreturn new class extends Migration {\n    public function up()\n    {\n        Schema::create('{$tableName}', function (Blueprint \$table) {\n            \$table->id();\n";
       foreach ($fields as $field) {
-        $line = "            \$table->{$field['fieldType']}('{$field['fieldName']}')";
-        $this->alert('line '.$line);
+        $line = "            \$table->{$field['fieldType']}('{$field['fieldName']}'";
+        if (!empty($field['length']) && is_numeric($field['length'])) {
+          $line .= ", {$field['length']}";
+        }
+        $line .= ")";
         if (!empty($field['nullable']) && $field['nullable']) {
-        $this->alert('line nullable and '.$line);
           $line .= "->nullable()";
         }
         $line .= ";\n";
         $migrationContent .= $line;
-        $this->alert($migrationContent);
       }
 
       foreach ($relations as $relation) {
@@ -89,7 +97,7 @@ class GenerateResourcesCommand extends Command
     }
 
     // ✅ Crear Modelo con `$fillable`
-    $fillableFields = array_map(fn ($field) => "'{$field['fieldName']}'", $fields);
+    $fillableFields = array_map(fn($field) => "'{$field['fieldName']}'", $fields);
     $fillableArray = implode(", ", $fillableFields);
 
     $modelContent = "<?php\n\nnamespace App\Models;\n\nuse Illuminate\Database\Eloquent\Model;\n\nclass {$name} extends Model\n{\n    protected \$table = '{$tableName}';\n    protected \$fillable = [{$fillableArray}];\n}\n";
