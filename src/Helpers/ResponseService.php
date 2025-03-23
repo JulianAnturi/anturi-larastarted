@@ -8,29 +8,29 @@ use Exception;
 class ResponseService 
 {
 
-  public function responseGet($data)
+  public static function responseGet($data)
   {
     return \Illuminate\Support\Facades\Response::json($data,200);
   }
-  public function responseDelete($modelo)
+  public static function responseDelete($modelo)
   {
     $message = [ "message" => "El registro de $modelo se ha eliminado exitosamente", ];
     return \Illuminate\Support\Facades\Response::json($message,202);
   }
 
-  public function responseNotFound($modelo)
+  public static function responseNotFound($modelo)
   {
     $message = [ "message" => "Error! registro de $modelo no Existe", ];
     return \Illuminate\Support\Facades\Response::json($message,404);
   }
-  public function responseCreate(string $modelo, mixed $data)
+  public static function responseCreate(string $modelo, mixed $data)
   {
     $message = [ 'message' => "Registro $modelo creado exitosamente", 'data' => $data ];
     return \Illuminate\Support\Facades\Response::json($message, 201);
   }
 
 
-  public function responseImport($modelo, $data)
+  public static function responseImport($modelo, $data)
   {
     $message = [
       'message' => "Registros de $modelo importados exitosamente",
@@ -38,7 +38,7 @@ class ResponseService
     ];
     return \Illuminate\Support\Facades\Response::json($message, 201);
   }
-  public function responseUpdate($modelo, $data = null)
+  public static function responseUpdate($modelo, $data = null)
   {
     $message = [
       'message' => "Registro $modelo actualizado exitosamente",
@@ -46,7 +46,7 @@ class ResponseService
     ];
     return \Illuminate\Support\Facades\Response::json($message,);
   }
-  public function responseError(Exception $error)
+  public static function responseError(Exception $error)
   {
     if(env('LOG_LEVEL') =='debug'){
       return \Illuminate\Support\Facades\Response::json([
@@ -57,7 +57,7 @@ class ResponseService
       'message' => "Ups, algo salió mal",
     ], 500);
   }
-  public function responseErrorUser($error){
+  public static function responseErrorUser($error){
     return \Illuminate\Support\Facades\Response::json([
       'message' => $error
     ], 400);

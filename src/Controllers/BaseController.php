@@ -17,19 +17,21 @@ class BaseController extends Controller
 {
 
   protected $model;
-  protected $formRequest;
+  // protected $formRequest;
   protected $class = 'CommentsController'; //This is variable
   protected $responseName = 'Comentario'; //This is variable
   protected $table = 'comments'; //This is variable
   protected $CrudService;
   protected $responseService;
 
-  public function __construct( $model, $formRequest = null, CrudService $crudService, ResponseService $responseService )
+  public function __construct( $model,
+    // $formRequest,
+    CrudService $crudService, ResponseService $responseService )
   {
     $this->responseService = $responseService;
     $this->model = $model;
     $this->CrudService = $crudService;
-    $this->formRequest = $formRequest;
+    // $this->formRequest = $formRequest;
   }
 
   /*
