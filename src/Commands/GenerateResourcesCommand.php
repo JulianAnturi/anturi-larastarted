@@ -20,13 +20,13 @@ class GenerateResourcesCommand extends Command
     $migrationData = $this->generateMigrationContent($tableName);
     $fields = $migrationData['fields'];
     $relations = $migrationData['relations'];
-    // ✅ Crear Controlador
-    $this->generateControllerContent($name, $tableName, $fields);
     // ✅ Crear Modelo con `$fillable`
     $fillableFields = array_map(fn($field) => "'{$field['fieldName']}'", $fields);
     $fillableArray = implode(", ", $fillableFields);
     $this->generateModelContent($name, $tableName, $fillableArray, $relations);
-
+    // ✅ Crear Controlador
+    $this->generateControllerContent($name, $tableName, $fields);
+    $this->generateRouteFile($name);
 
     $this->info("Controlador, Modelo y rutas generados para {$name} correctamente.");
   }
@@ -71,22 +71,21 @@ class GenerateResourcesCommand extends Command
 
 namespace App\Http\Controllers;
 
-use App\Models\\{$name};
+use App\Models\\{$name} as Model;
 use Illuminate\Http\Request;
 use Anturi\\Larastarted\\Controllers\\BaseController;
 use Anturi\\Larastarted\\Helpers\\ResponseService;
-use Anturi\\Larastarted\\Helpers\\CrudService;
 
 class {$name}Controller extends BaseController
 {
-  protected \$model = {$name}::class;
+  protected \$model;
   protected \$table = '{$tableName}';
   protected \$class = '{$name}Controller';
   protected \$responseName = '{$name}';
 
-  public function __construct(CrudService \$crudService, ResponseService \$responseService)
+  public function __construct(Model \$model)
   {
-    parent::__construct(\$crudService, \$responseService);
+    parent::__construct(\$model, \$this->class,\$this->responseName,\$this->table);
   }
 
   public function index(Request \$request)
@@ -96,8 +95,9 @@ class {$name}Controller extends BaseController
 
   public function store(Request \$request)
   {
-    \$this->validate(\$request);
-    return \$this->antStore(\$request);
+    \$this->validateForm(\$request);
+    \$data = \$request->all();
+    return \$this->antStore(\$data);
   }
 
   public function show(\$id)
@@ -107,7 +107,7 @@ class {$name}Controller extends BaseController
 
   public function update(Request \$request, \$id)
   {
-    \$this->validate(\$request);
+    \$this->validateForm(\$request);
     return \$this->antUpdate(\$request, \$id);
   }
 
@@ -116,7 +116,7 @@ class {$name}Controller extends BaseController
     return \$this->antDestroy(\$id);
   }
 
-  private function validate(Request \$request)
+  private function validateForm(Request \$request)
   {
     \$request->validate([
   {$validationRules}        ]);
@@ -131,12 +131,12 @@ class {$name}Controller extends BaseController
   {
 
     $modelPath = App::path("Models/{$name}.php");
-$relationsContent = "";
-foreach ($relations as $relation) {
-    $methodName = str_replace('_id', '', $relation['relationField']);
-    $relatedModel = ucfirst($methodName);
-    $relationsContent .= "\n    public function {$methodName}()\n    {\n        return \$this->belongsTo({$relatedModel}::class);\n    }\n";
-}
+    $relationsContent = "";
+    foreach ($relations as $relation) {
+      $methodName = str_replace('_id', '', $relation['relationField']);
+      $relatedModel = ucfirst($methodName);
+      $relationsContent .= "\n    public function {$methodName}()\n    {\n        return \$this->belongsTo({$relatedModel}::class);\n    }\n";
+    }
     $modelContent = "<?php\n\nnamespace App\Models;\n\nuse Illuminate\Database\Eloquent\Model;\n\nclass {$name} extends Model\n{\n    protected \$table = '{$tableName}';\n    protected \$fillable = [{$fillableArray}];\n\n    {$relationsContent}\n}";
     File::put($modelPath, $modelContent);
   }
@@ -232,5 +232,47 @@ foreach ($relations as $relation) {
         'relations' => $relations
       ];
     }
+        return [
+        'fields' => [],
+        'relations' => []
+    ];
   }
+
+  private function generateRouteFile($name): void
+  {
+    $routeFile = base_path("routes/{$name}.php");
+    $apiFile = base_path("routes/api.php");
+    $controllerName = "{$name}Controller::class";
+    $routeName = strtolower($name); // para usar en la ruta
+
+    // Preguntar por middleware
+    $useMiddleware = $this->confirm("¿Deseas agregar un middleware a la ruta?", false);
+    $middleware = $useMiddleware ? $this->ask("Nombre del middleware (ej: auth:sanctum)") : null;
+
+    // Generar contenido del archivo de rutas individuales
+    $routeContent = "<?php\n\nuse Illuminate\Support\Facades\Route;\nuse App\Http\Controllers\\{$name}Controller;\n\n";
+    if ($middleware) {
+      $routeContent .= "Route::middleware('{$middleware}')->group(function () {\n";
+      $routeContent .= "    Route::apiResource('{$routeName}', {$controllerName});\n";
+      $routeContent .= "});\n";
+    } else {
+      $routeContent .= "Route::apiResource('{$routeName}', {$controllerName});\n";
+    }
+
+    // Crear archivo de ruta individual
+    File::put($routeFile, $routeContent);
+    $this->info("Archivo de rutas creado: routes/{$name}.php");
+
+    // Agregar el require en api.php si no existe aún
+    $requireLine = "require __DIR__ . '/{$name}.php';";
+    $apiContent = File::get($apiFile);
+
+    if (!str_contains($apiContent, $requireLine)) {
+      File::append($apiFile, "\n" . $requireLine);
+      $this->info("Línea de require añadida a api.php");
+    } else {
+      $this->info("El require ya existe en api.php");
+    }
+  }
+
 }

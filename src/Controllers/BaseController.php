@@ -3,35 +3,32 @@
 
 namespace Anturi\Larastarted\Controllers;
 
-// use Illuminate\Routing\Controller;
-use App\Http\Controllers\Controller;
 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Anturi\Larastarted\Helpers\ResponseService;
 use Anturi\Larastarted\Helpers\LogService;
 use Anturi\Larastarted\Helpers\CrudService;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Routing\Controller ;
 
 class BaseController extends Controller
 {
 
-  protected $model;
-  // protected $formRequest;
-  protected $class = 'CommentsController'; //This is variable
-  protected $responseName = 'Comentario'; //This is variable
-  protected $table = 'comments'; //This is variable
-  protected $CrudService;
-  protected $responseService;
+  use AuthorizesRequests, ValidatesRequests;
 
-  public function __construct( $model,
-    // $formRequest,
-    CrudService $crudService, ResponseService $responseService )
-  {
-    $this->responseService = $responseService;
+  protected $model;
+  protected $class; //This is variable
+  protected $responseName; //This is variable
+  protected $table; //This is variable
+
+  public function __construct( $model, $class, $responseName, $table) {
     $this->model = $model;
-    $this->CrudService = $crudService;
-    // $this->formRequest = $formRequest;
+    $this->class = $class;
+    $this->responseName = $responseName;
+    $this->table = $table;
   }
 
   /*
@@ -42,11 +39,11 @@ class BaseController extends Controller
   {
     try
     {
-      return $this->CrudService->index($this->model, $request);
+      return CrudService::index($this->model, $request);
     }catch(Exception $e)
     {
-      LogService::catchError($e,env('APP_NAME'),$this->class,__LINE__);
-      return $this->responseService->responseError($e);
+      // LogService::catchError($e,env('APP_NAME'),$this->class,__LINE__);
+      return ResponseService::responseError($e);
 
     }
   }
@@ -54,32 +51,29 @@ class BaseController extends Controller
   /*
    * Store a model on DataBase
    */
-  public function antStore(Request $request)
+  public function antStore(array $request)
   {
     try
     {
-      $this->validate($request);
-      $this->CrudService->store($this->model, $request, $this->responseName);
+     return CrudService::store($this->model, $request, $this->responseName);
     }catch(Exception $e)
     {
       LogService::catchError($e,env('APP_NAME'),$this->class,__LINE__);
-      return $this->responseService->responseError($e);
+      return ResponseService::responseError($e);
     }
   }
 
   /*
    * Update a record from database
    */
-  public function antUpdate(Request $request, $id){
+  public function antUpdate(array $request, $id){
     try
     {
-      $this->validate($request);
-      $data = $request->all();
-      $this->CrudService->update($id, $this->table,$data,$this->responseName );
+      return CrudService::update($id, $this->table,$request,$this->responseName );
     }catch(Exception $e)
     {
       LogService::catchError($e,env('APP_NAME'),$this->class,__LINE__);
-      return $this->responseService->responseError($e);
+      return ResponseService::responseError($e);
     }
   }
 
@@ -91,11 +85,23 @@ class BaseController extends Controller
   {
     try
     {
-      $this->CrudService->destroy($id,$this->model, $this->responseName);
+     return  CrudService::destroy($id,$this->model, $this->responseName);
     }catch(Exception $e)
     {
       LogService::catchError($e,env('APP_NAME'),$this->class,__LINE__);
-      return $this->responseService->responseError($e);
+      return ResponseService::responseError($e);
+    }
+  }
+
+  public function antShow($id,$model){
+    try{
+
+    return CrudService::show($id,$model);
+
+    }catch(Exception $e)
+    {
+      // LogService::catchError($e,env('APP_NAME'),$this->class,__LINE__);
+      return ResponseService::responseError($e);
     }
   }
 
