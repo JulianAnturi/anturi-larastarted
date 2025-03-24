@@ -1,7 +1,7 @@
 <?php
 
 namespace Anturi\Larastarted\Commands;
-
+//TODO: los campos de relaciones no se estan llenando en el fillable del archivo migracion 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\App;
@@ -16,15 +16,38 @@ class GenerateResourcesCommand extends Command
     $name = ucfirst($this->argument('name')); // Capitaliza la primera letra
     $tableName = $this->argument('table'); // Convención: pluraliza el nombre del modelo
 
+    // ✅ Crear Controlador
+    $this->generateControllerContent($name, $tableName);
+    //crea la migracion y retorna los campos listos para entregar en el modelo 
+    $fields = $this->generateMigrationContent($tableName);
+    // ✅ Crear Modelo con `$fillable`
+    $fillableFields = array_map(fn($field) => "'{$field['fieldName']}'", $fields);
+    $fillableArray = implode(", ", $fillableFields);
+    $this->generateModelContent($name,$tableName,$fillableArray);
+    
+
+    $this->info("Controlador, Modelo y rutas generados para {$name} correctamente.");
+  }
+  
+  private function generateControllerContent($name, $tableName): void{
+
     $controllerPath = App::path("Http/Controllers/{$name}Controller.php");
+    File::put($controllerPath, "<?php\n\nnamespace App\Http\Controllers;\n\nuse App\Models\\{$name};\nuse Illuminate\Http\Request;\nuse Anturi\Larastarted\Controllers\BaseController;\nuse Anturi\Larastarted\Helpers\ResponseService;\nuse Anturi\Larastarted\Helpers\CrudService;\n\nclass {$name}Controller extends BaseController\n{\n    protected \$model = {$name}::class;\n    protected \$table = '{$tableName}';\n    protected \$class = '{$name}Controller';\n    protected \$responseName = '{$name}';\n\n    public function __construct(CrudService \$crudService, ResponseService \$responseService)\n    {\n        parent::__construct(\$crudService, \$responseService);\n    }\n\n    /**\n     * Mostrar todos los registros.\n     */\n    public function index(Request \$request)\n    {\n        return \$this->antIndex(\$request);\n    }\n\n    /**\n     * Guardar un nuevo registro en la base de datos.\n     */\n    public function store(Request \$request)\n    {\n        return \$this->antStore(\$request);\n    }\n\n    /**\n     * Mostrar un registro específico.\n     */\n    public function show(\$id)\n    {\n        return \$this->antShow(\$this->table, 'id');\n    }\n\n    /**\n     * Actualizar un registro en la base de datos.\n     */\n    public function update(Request \$request, \$id)\n    {\n        return \$this->antUpdate(\$request, \$id);\n    }\n\n    /**\n     * Eliminar un registro de la base de datos.\n     */\n    public function destroy(\$id)\n    {\n        return \$this->antDestroy(\$id);\n    }\n\n    /**\n     * Seleccionar registros con campos específicos.\n     */\n   // public function select(\$id, \$field = 'name')\n //   {\n       // return \$this->antSelect(\$this->table, \$id, \$field);\n  //  }\n\n    /**\n     * Obtener registros relacionados de otra tabla.\n     */\n  //  public function subSelect(\$table, \$tableId, \$parentTable, \$parentTableId, \$parentIdValue, \$field)\n    {\n        return \$this->antsubSelect(\$table, \$tableId, \$parentTable, \$parentTableId, \$parentIdValue, \$field);\n    }\n}\n");
+  }
+   
+  private function generateModelContent($name, $tableName, $fillableArray):void{
+
     $modelPath = App::path("Models/{$name}.php");
+    $modelContent = "<?php\n\nnamespace App\Models;\n\nuse Illuminate\Database\Eloquent\Model;\n\nclass {$name} extends Model\n{\n    protected \$table = '{$tableName}';\n    protected \$fillable = [{$fillableArray}];\n}\n";
+    File::put($modelPath, $modelContent);
+  }
+
+  private function generateMigrationContent($tableName): array {
+    
+    $fields = [];
     $migrationFileName = date('Y_m_d_His') . "_create_{$tableName}_table.php";
     $migrationPath = database_path("migrations/{$migrationFileName}");
 
-    // ✅ Crear Controlador
-    File::put($controllerPath, "<?php\n\nnamespace App\Http\Controllers;\n\nuse App\Models\\{$name};\nuse Illuminate\Http\Request;\nuse Anturi\Larastarted\Controllers\BaseController;\nuse Anturi\Larastarted\Helpers\ResponseService;\nuse Anturi\Larastarted\Helpers\CrudService;\n\nclass {$name}Controller extends BaseController\n{\n    protected \$model = {$name}::class;\n    protected \$table = '{$tableName}';\n    protected \$class = '{$name}Controller';\n    protected \$responseName = '{$name}';\n\n    public function __construct(CrudService \$crudService, ResponseService \$responseService)\n    {\n        parent::__construct(\$crudService, \$responseService);\n    }\n\n    /**\n     * Mostrar todos los registros.\n     */\n    public function index(Request \$request)\n    {\n        return \$this->antIndex(\$request);\n    }\n\n    /**\n     * Guardar un nuevo registro en la base de datos.\n     */\n    public function store(Request \$request)\n    {\n        return \$this->antStore(\$request);\n    }\n\n    /**\n     * Mostrar un registro específico.\n     */\n    public function show(\$id)\n    {\n        return \$this->antShow(\$this->table, 'id');\n    }\n\n    /**\n     * Actualizar un registro en la base de datos.\n     */\n    public function update(Request \$request, \$id)\n    {\n        return \$this->antUpdate(\$request, \$id);\n    }\n\n    /**\n     * Eliminar un registro de la base de datos.\n     */\n    public function destroy(\$id)\n    {\n        return \$this->antDestroy(\$id);\n    }\n\n    /**\n     * Seleccionar registros con campos específicos.\n     */\n   // public function select(\$id, \$field = 'name')\n //   {\n       // return \$this->antSelect(\$this->table, \$id, \$field);\n  //  }\n\n    /**\n     * Obtener registros relacionados de otra tabla.\n     */\n  //  public function subSelect(\$table, \$tableId, \$parentTable, \$parentTableId, \$parentIdValue, \$field)\n    {\n        return \$this->antsubSelect(\$table, \$tableId, \$parentTable, \$parentTableId, \$parentIdValue, \$field);\n    }\n}\n");
-    // ✅ Preguntar si se debe crear una migración
-    $fields = [];
     if ($this->confirm("¿Deseas crear una migración para {$tableName}?", true)) {
       do {
         $fieldName = $this->ask("Nombre del campo (deja vacío para finalizar)");
@@ -52,6 +75,7 @@ class GenerateResourcesCommand extends Command
 
       // ✅ Preguntar por relaciones
       $relations = [];
+      $relationships = [];
       if ($this->confirm("¿Deseas agregar relaciones?", false)) {
         do {
           $relationField = $this->ask("Nombre del campo de la relación (ejemplo: user_id)");
@@ -60,6 +84,7 @@ class GenerateResourcesCommand extends Command
             $referenceTable = $this->ask("Tabla referenciada (ejemplo: users)");
             $cascade = $this->confirm("¿Cascade ON DELETE y ON UPDATE?", true);
             $relations[] = compact('relationField', 'reference', 'referenceTable', 'cascade');
+            $relationships[] = $relationField;
           }
         } while ($this->confirm("¿Deseas agregar otra relación?", false));
       }
@@ -93,17 +118,7 @@ class GenerateResourcesCommand extends Command
 
       // ✅ Guardar la migración
       File::put($migrationPath, $migrationContent);
-      $this->info("Migración creada: {$migrationPath}");
+      return $fields;
     }
-
-    // ✅ Crear Modelo con `$fillable`
-    $fillableFields = array_map(fn($field) => "'{$field['fieldName']}'", $fields);
-    $fillableArray = implode(", ", $fillableFields);
-
-    $modelContent = "<?php\n\nnamespace App\Models;\n\nuse Illuminate\Database\Eloquent\Model;\n\nclass {$name} extends Model\n{\n    protected \$table = '{$tableName}';\n    protected \$fillable = [{$fillableArray}];\n}\n";
-
-    File::put($modelPath, $modelContent);
-
-    $this->info("Controlador, Modelo y rutas generados para {$name} correctamente.");
   }
 }
