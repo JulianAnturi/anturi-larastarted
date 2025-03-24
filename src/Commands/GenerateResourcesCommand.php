@@ -102,13 +102,14 @@ class {$name}Controller extends BaseController
 
   public function show(\$id)
   {
-    return \$this->antShow(\$this->table, 'id');
+    return \$this->antShow(\$id,\$this->model);
   }
 
   public function update(Request \$request, \$id)
   {
     \$this->validateForm(\$request);
-    return \$this->antUpdate(\$request, \$id);
+    \$data = \$request->all();
+    return \$this->antUpdate(\$data, \$id);
   }
 
   public function destroy(\$id)
@@ -119,7 +120,8 @@ class {$name}Controller extends BaseController
   private function validateForm(Request \$request)
   {
     \$request->validate([
-  {$validationRules}        ]);
+  {$validationRules}        
+    ]);
   }
   }
 ";
@@ -232,9 +234,9 @@ class {$name}Controller extends BaseController
         'relations' => $relations
       ];
     }
-        return [
-        'fields' => [],
-        'relations' => []
+    return [
+      'fields' => [],
+      'relations' => []
     ];
   }
 

@@ -66,7 +66,7 @@ class BaseController extends Controller
   /*
    * Update a record from database
    */
-  public function antUpdate(array $request, $id){
+  public function antUpdate( $request, $id){
     try
     {
       return CrudService::update($id, $this->table,$request,$this->responseName );
