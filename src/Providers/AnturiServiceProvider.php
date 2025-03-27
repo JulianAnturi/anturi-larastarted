@@ -24,9 +24,12 @@ class AnturiServiceProvider extends ServiceProvider
         
         // Publicar archivos de configuración y controladores
       $this->publishes([
-        __DIR__.'/../config/larastarted.php' => config_path('larastarted.php'),
+      __DIR__.'/../config/larastarted.php' => config_path('larastarted.php'),
         __DIR__.'/../Controllers/BaseController.php' => app_path('Http/Controllers/BaseController.php'),
-      ], 'larastarted');
+        __DIR__.'/../Migrations/2024_03_09_create_logs_table.php' =>database_path('migrations/2024_03_09_create_logs_table.php'),
+     ], 'larastarted');
+
+    // /Providers/../migrations/2024_03_09_create_logs_table.php>.  
 
       // Registrar el comando artisan
       if ($this->app->runningInConsole()) {
