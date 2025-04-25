@@ -69,8 +69,8 @@ class GenerateResourcesCommandTest extends TestCase
     File::delete(base_path('routes/api.php'));
 
     $this->artisan('anturi:generate Post posts')
-      ->expectsOutput('¡Error! El archivo \'routes/api.php\' no existe.')
-      ->expectsOutput('Por favor, ejecuta el siguiente comando primero:')
+      ->expectsOutput('¡Error! File \'routes/api.php\' does not exists.')
+      ->expectsOutput('Please execute first the following command:')
       ->expectsOutput('php artisan install:api')
       ->assertExitCode(1);
   }

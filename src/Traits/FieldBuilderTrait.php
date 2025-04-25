@@ -8,21 +8,21 @@ trait FieldBuilderTrait
   {
     $fields = [];
     do {
-      $fieldName = $this->ask("Nombre del campo (deja vacío para finalizar)");
+      $fieldName = $this->ask("Field name (leave empty to finish)");
       if ($fieldName) {
         $fieldType = $this->choice(
-          "Selecciona el tipo de dato para '{$fieldName}'",
-          ['string', 'integer', 'unsignedBigInteger', 'boolean', 'text', 'date', 'timestamps'],
+          "Select the data type for '{$fieldName}'",
+          ['string', 'integer', 'unsignedBigInteger', 'boolean', 'text', 'date'],
           0
         );
 
         $length = null;
         if (in_array($fieldType, ['string', 'integer'])) {
-          $length = $this->ask("¿Longitud para '{$fieldName}'? (deja vacío para usar la predeterminada)");
+          $length = $this->ask("Length for '{$fieldName}'? (leave empty for default)");
           $length = is_numeric($length) ? (int) $length : null;
         }
 
-        $isNullable = $this->confirm("¿El campo '{$fieldName}' puede ser nulo?", false);
+        $isNullable = $this->confirm("Can the field '{$fieldName}' be nullable?", false);
 
         $fields[] = [
           'fieldName' => $fieldName,
@@ -39,13 +39,13 @@ trait FieldBuilderTrait
   protected function askForRelations(): array
   {
     $relations = [];
-    if ($this->confirm("¿Deseas agregar relaciones?", false)) {
+    if ($this->confirm("Do you want to add relations?", false)) {
       do {
-        $relationField = $this->ask("Nombre del campo de la relación (ejemplo: user_id)");
+        $relationField = $this->ask("Relation field name (e.g., user_id)");
         if ($relationField) {
-          $reference = $this->ask("Campo referenciado (deja vacío para 'id')") ?: 'id';
-          $referenceTable = $this->ask("Tabla referenciada (ejemplo: users)");
-          $cascade = $this->confirm("¿Cascade ON DELETE y ON UPDATE?", true);
+          $reference = $this->ask("Referenced field (leave empty for 'id')") ?: 'id';
+          $referenceTable = $this->ask("Referenced table (e.g., users)");
+          $cascade = $this->confirm("Cascade ON DELETE and ON UPDATE?", true);
 
           $relations[] = [
             'relationField' => $relationField,
@@ -54,7 +54,7 @@ trait FieldBuilderTrait
             'cascade' => $cascade
           ];
         }
-      } while ($this->confirm("¿Deseas agregar otra relación?", false));
+      } while ($this->confirm("Do you want to add another relation?", false));
     }
     return $relations;
   }
