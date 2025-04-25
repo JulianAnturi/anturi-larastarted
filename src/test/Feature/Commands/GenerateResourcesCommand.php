@@ -40,14 +40,14 @@ class GenerateResourcesCommandTest extends TestCase
   public function test_generates_all_resources()
   {
     $this->artisan('anturi:generate Post posts')
-      ->expectsQuestion('¿Deseas crear una migración para posts?', true)
-      ->expectsQuestion('Nombre del campo (deja vacío para finalizar)', 'title')
-      ->expectsQuestion("Selecciona el tipo de dato para 'title'", 'string')
-      ->expectsQuestion("¿Longitud para 'title'? (deja vacío para usar la predeterminada)", '255')
-      ->expectsQuestion("¿El campo 'title' puede ser nulo?", false)
-      ->expectsQuestion('Nombre del campo (deja vacío para finalizar)', '')
-      ->expectsQuestion('¿Deseas agregar relaciones?', false)
-      ->expectsQuestion('¿Deseas agregar un middleware a la ruta?', false)
+      ->expectsQuestion('¿Do you with to create a migration?', true)
+      ->expectsQuestion('Name of field  (let empty to finish)', 'title')
+      ->expectsQuestion("Select the data type for 'title'", 'string')
+      ->expectsQuestion("Length for 'title'? (leave empty to use default)", '255')
+      ->expectsQuestion("Can the 'title' field be nullable?", false)
+      ->expectsQuestion("Field name (leave empty to finish)", '')
+      ->expectsQuestion("Do you want to add relationships?", false)
+      ->expectsQuestion("Do you want to add a middleware to the route?", false)
       ->assertExitCode(0);
 
     // Verificar archivos generados

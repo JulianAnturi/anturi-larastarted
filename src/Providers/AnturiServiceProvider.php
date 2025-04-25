@@ -24,7 +24,7 @@ class AnturiServiceProvider extends ServiceProvider
     $this->publishes([
       __DIR__ . '/../config/larastarted.php' => config_path('larastarted.php'),
       __DIR__ . '/../Migrations/2024_03_09_create_logs_table.php' => database_path('migrations/2024_03_09_create_logs_table.php'),
-    ], 'larastarted');
+    ], 'anturi-larastarted');
 
     // Publicar BaseController con namespace modificado
     $this->publishBaseControllerWithCustomNamespace();

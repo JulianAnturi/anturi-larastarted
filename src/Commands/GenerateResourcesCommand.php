@@ -14,7 +14,7 @@ class GenerateResourcesCommand extends Command
   use FieldBuilderTrait;
 
   protected $signature = 'anturi:generate {name} {table}';
-  protected $description = 'Genera un Controlador, Modelo y Migración.';
+  protected $description = 'Generate a migration, model and controller.';
 
   private MigrationGenerator $migrationGenerator;
   private ModelGenerator $modelGenerator;
@@ -40,8 +40,8 @@ class GenerateResourcesCommand extends Command
     $tableName = $this->argument('table');
 
     if (!file_exists(base_path("routes/api.php"))) {
-      $this->error("¡Error! El archivo 'routes/api.php' no existe.");
-      $this->line("Por favor, ejecuta el siguiente comando primero:");
+      $this->error("¡Error! File 'routes/api.php' does not  exists.");
+      $this->line("Please execute the following command first:");
       $this->info("php artisan install:api");
       return 1;
     }
@@ -66,11 +66,11 @@ class GenerateResourcesCommand extends Command
       $migrationData['fields']
     );
 
-    $useMiddleware = $this->confirm("¿Deseas agregar un middleware a la ruta?", false);
-    $middleware = $useMiddleware ? $this->ask("Nombre del middleware (ej: auth:sanctum)") : null;
+    $useMiddleware = $this->confirm("Do you wish add a middleware to your route?", false);
+    $middleware = $useMiddleware ? $this->ask("Middleware's name (ex: auth:sanctum)") : null;
 
     $this->routeGenerator->generate($name, $useMiddleware, $middleware);
 
-    $this->info("Controlador, Modelo y rutas generados para {$name} correctamente.");
+    $this->info("Controller, Model y Routes generated for {$name} successfully.");
   }
 }
