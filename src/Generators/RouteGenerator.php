@@ -8,7 +8,7 @@ class RouteGenerator
 {
   public function generate(string $name, bool $useMiddleware = false, ?string $middleware = null): void
   {
-    $routeFile = base_path("routes/{$name}.php");
+    $routeFile = base_path("routes/{$name}Route.php");
     $apiFile = base_path("routes/api.php");
     $routeName = strtolower($name);
     $controllerName = "{$name}Controller";
