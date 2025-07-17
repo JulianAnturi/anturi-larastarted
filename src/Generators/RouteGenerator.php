@@ -11,7 +11,7 @@ class RouteGenerator
     $routeFile = base_path("routes/{$name}.php");
     $apiFile = base_path("routes/api.php");
     $routeName = strtolower($name);
-    $controllerName = "{$name}Controller::class";
+    $controllerName = "{$name}Controller";
 
     $routeContent = $this->buildRouteContent($routeName, $controllerName, $useMiddleware, $middleware);
     File::put($routeFile, $routeContent);
@@ -25,7 +25,7 @@ class RouteGenerator
 
     if ($useMiddleware && $middleware) {
       $content .= "Route::middleware('{$middleware}')->group(function () {\n";
-      $content .= "    Route::apiResource('{$routeName}', {$controllerName});\n";
+      $content .= "    Route::apiResource('{$routeName}', {$controllerName}::class);\n";
       $content .= "});\n";
     } else {
       $content .= "Route::apiResource('{$routeName}', {$controllerName});\n";
